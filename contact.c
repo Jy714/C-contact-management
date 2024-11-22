@@ -34,17 +34,36 @@ void showMenu()
   printf("============================================\n");
 }
 
+// toLowerCaseFunction
+void toLowerCase(char str[])
+{
+  for (int i = 0; str[i] != '\0'; i++)
+  {
+    str[i] = tolower(str[i]);
+  }
+}
+
+// used to print the list
+void printList(int userCount)
+{
+  for (int i = 0; i < userCount; i++)
+  {
+    printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
+  }
+}
+
 // Function to validate email Need to change
 int isValidEmail(char email[])
 {
-  int atSymbol = 0, dot = 0;
+  int aSymbol = 0;
+  int dot = 0;
   char *atLocation = NULL;
 
   // Check if there is an '@' symbol and at least one '.'
   atLocation = strchr(email, '@'); // Find the first '@' symbol
   if (atLocation != NULL)
   {
-    atSymbol = 1;
+    aSymbol = 1;
     // Check if there's a dot after '@'
     if (strchr(atLocation, '.') != NULL)
     {
@@ -52,7 +71,7 @@ int isValidEmail(char email[])
     }
   }
   // Return true if both '@' and '.' exist and '@' comes before '.'
-  return (atSymbol && dot);
+  return (aSymbol && dot);
 }
 
 // Function to validate contact number (based on Malaysia phone number)
@@ -104,6 +123,7 @@ int saveToFile(User user)
   fclose(out);
 }
 
+// save to file function batch
 int saveToFileBatch(User *user, int number)
 {
   // declare an output file pointer
@@ -165,11 +185,8 @@ void addContact()
     user[i].phone[strcspn(user[i].phone, "\n")] = '\0';
 
     // in order to make the comparison (sort) easier and fair, we decided to convert the strings to lowerCase
-    for (int j = 0; j < MAX_PROPERTY_LENGTH; j++)
-    { // 50 is the max length of User's property
-      user[i].name[j] = tolower(user[i].name[j]);
-      user[i].email[j] = tolower(user[i].email[j]);
-    }
+    toLowerCase(user[i].name);
+    toLowerCase(user[i].email);
 
     // input validate (pass == 1  fail == 0)
     int emailRes = isValidEmail(user[i].email);
@@ -233,7 +250,7 @@ void sortContact()
   // error handling
   if (userCount == 0)
   {
-    printf("No users in the file. \n");
+    printf("No users found in the file. \n");
     return;
   }
 
@@ -297,10 +314,7 @@ void sortContact()
   printf("User after sorted\n");
   printf("no. Name Phone Email\n");
 
-  for (int i = 0; i < userCount; i++)
-  {
-    printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
-  }
+  printList(userCount);
 }
 
 // display user
@@ -326,10 +340,7 @@ int displayUser()
 
   printf("Name    Phone    Email\n");
   // loop to print the user
-  for (int i = 0; i < userCount; i++)
-  {
-    printf("%d. %s %s  %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
-  }
+  printList(userCount);
 
   return userCount;
 }
@@ -369,10 +380,8 @@ void editContact()
 
     newName[strcspn(newName, "\n")] = '\0';
 
-    for (int j = 0; j < MAX_PROPERTY_LENGTH; j++)
-    {
-      newName[j] = tolower(newName[j]);
-    }
+    toLowerCase(newName);
+
     strcpy(list[userToEdit - 1].name, newName);
     break;
   }
@@ -409,10 +418,7 @@ void editContact()
       exit(1);
     }
 
-    for (int j = 0; j < MAX_PROPERTY_LENGTH; j++)
-    {
-      newEmail[j] = tolower(newEmail[j]);
-    }
+    toLowerCase(newEmail);
     strcpy(list[userToEdit - 1].email, newEmail);
     break;
   }
@@ -433,11 +439,8 @@ void editContact()
     newPhone[strcspn(newPhone, "\n")] = '\0';
     newEmail[strcspn(newEmail, "\n")] = '\0';
 
-    for (int j = 0; j < MAX_PROPERTY_LENGTH; j++)
-    {
-      newName[j] = tolower(newName[j]);
-      newEmail[j] = tolower(newEmail[j]);
-    }
+    toLowerCase(newName);
+    toLowerCase(newEmail);
 
     int emailRes = isValidEmail(newEmail);
     int phoneRes = isValidNumber(newPhone);
@@ -474,13 +477,14 @@ void editContact()
   printf("Edit Successfully!\n");
 }
 
-// search name that are use for both search and delete function
+// search name that are use for both search and delete function (it also can do the partial search)
 int searchContactByName(const char *name, int *indices, int maxIndices)
 {
   int userCount = readFile("contact.txt", list, 80);
 
   if (userCount <= 0)
   {
+    // if 0 print no user found, others must be less than 0
     printf(userCount == 0 ? "No users found!\n" : "Some error occurred when open the file...\n");
     return -1; // Return -1 for errors, 0 for no users
   }
@@ -491,10 +495,7 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
   searchName[MAX_PROPERTY_LENGTH - 1] = '\0';
 
   // Convert the search name to lowercase
-  for (int j = 0; searchName[j] != '\0'; j++)
-  {
-    searchName[j] = tolower(searchName[j]);
-  }
+  toLowerCase(searchName);
 
   int found = 0;
   printf("no. Name Phone Email\n");
@@ -504,7 +505,8 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
     strcpy(lowerName, list[i].name);
     lowerName[MAX_PROPERTY_LENGTH - 1] = '\0';
 
-    if (strcmp(lowerName, searchName) == 0)
+    // here is the key that allow us to do the partial function
+    if (strncmp(lowerName, searchName, strlen(searchName)) == 0)
     {
       printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
 
@@ -536,7 +538,7 @@ void searchContact()
 
   if (result > 0)
   {
-    printf("Total matches found: %d\n", result);
+    printf("Total contact found: %d\n", result);
   }
 }
 
