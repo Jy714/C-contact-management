@@ -129,7 +129,7 @@ void addContact()
 {
   int num;
 
-  printf("Enter number of user you like to add: ");
+  printf("Enter number of user you like to add (max:80): ");
   // less than 100 user in a time
   scanf("%2d", &num);
 
@@ -137,6 +137,13 @@ void addContact()
   // Exp: Enter user's name: Enter user's phone number:
   while (getchar() != '\n')
     ;
+
+  // error handling with invalid input
+  if (num <= 0 || num > 80)
+  {
+    printf("Invalid Input!\n");
+    return;
+  }
 
   User user[80];
 
