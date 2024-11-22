@@ -474,13 +474,88 @@ void editContact()
   printf("Edit Successfully!\n");
 }
 
+// search name that are use for both search and delete function
+int searchContactByName(const char *name, int *indices, int maxIndices)
+{
+  int userCount = readFile("contact.txt", list, 80);
+
+  if (userCount <= 0)
+  {
+    printf(userCount == 0 ? "No users found!\n" : "Some error occurred when open the file...\n");
+    return -1; // Return -1 for errors, 0 for no users
+  }
+
+  // ask for user input
+  char searchName[MAX_PROPERTY_LENGTH];
+  strncpy(searchName, name, MAX_PROPERTY_LENGTH);
+  searchName[MAX_PROPERTY_LENGTH - 1] = '\0';
+
+  // Convert the search name to lowercase
+  for (int j = 0; searchName[j] != '\0'; j++)
+  {
+    searchName[j] = tolower(searchName[j]);
+  }
+
+  int found = 0;
+  printf("no. Name Phone Email\n");
+  for (int i = 0; i < userCount; i++)
+  {
+    char lowerName[MAX_PROPERTY_LENGTH];
+    strcpy(lowerName, list[i].name);
+    lowerName[MAX_PROPERTY_LENGTH - 1] = '\0';
+
+    if (strcmp(lowerName, searchName) == 0)
+    {
+      printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
+
+      if (indices != NULL && found < maxIndices)
+      {
+        indices[found] = i; // Store the index of the match
+      }
+      found++;
+    }
+  }
+
+  if (found == 0)
+  {
+    printf("No contacts found with the name '%s'.\n", name);
+  }
+
+  return found; // Return the number of matches found
+}
+
+// search by name
+void searchContact()
+{
+  char name[MAX_PROPERTY_LENGTH];
+  printf("Enter the name you want to search for: ");
+  fgets(name, MAX_PROPERTY_LENGTH, stdin);
+  name[strcspn(name, "\n")] = '\0';
+
+  int result = searchContactByName(name, NULL, 0); // NULL means we don't need indices
+
+  if (result > 0)
+  {
+    printf("Total matches found: %d\n", result);
+  }
+}
+
 // delete user
 void deleteByName()
 {
-  int userCount = displayUser();
 
-  while (getchar() != '\n')
-    ; // Flush leftover characters
+  int userCount = readFile("contact.txt", list, 80);
+
+  if (userCount == -1)
+  {
+    printf("Error reading the file.\n");
+    return;
+  }
+  if (userCount == 0)
+  {
+    printf("No users found.\n");
+    return;
+  }
 
   // user input
   char deletedName[MAX_PROPERTY_LENGTH];
@@ -489,38 +564,18 @@ void deleteByName()
 
   deletedName[strcspn(deletedName, "\n")] = '\0';
 
-  for (int j = 0; j < MAX_PROPERTY_LENGTH; j++)
-  {
-    deletedName[j] = tolower(deletedName[j]);
-  }
+  int indices[80]; // use to store the indices if the name match
+  int result = searchContactByName(deletedName, indices, 80);
 
-  int found = 0; // use to record whether found the name in file,if not then print not found
-  // find the name in the array that same as user input's name
-  int deletedIndex[userCount]; // used to record the index of deleted contact
-  int index = 0;               // used to record deletedIndex array's index
-  printf("no. Name Phone Email\n");
-  for (int i = 0; i < userCount; i++)
+  if (result <= 0)
   {
-    if (strcmp(list[i].name, deletedName) == 0)
-    { // equal to 0 means same
-      printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
-      deletedIndex[index] = i;
-      index++;
-      found++;
-    }
-  }
-
-  if (found == 0)
-  { // if no contact found
-    printf("no contact found...");
     return;
   }
 
-  if (found > 1)
+  if (result > 1)
   { // means only 1 contact found
-    printf("We found %d contact with same name would you like to delete 1 or all? \n", found);
-    printf("1. One\n");
-    printf("2. All\n");
+    printf("We found %d contact with same name would you like to delete 1 or all? \n", result);
+    printf("1. Delete One\n2. Delete All\n");
     printf("User input: ");
 
     int deleteSelection;
@@ -534,9 +589,11 @@ void deleteByName()
       scanf("%d", &decision);
       getchar();
 
-      for (int i = 0; i < index; i++)
+      int deleteIndex = indices[deleteSelection - 1];
+
+      for (int i = deleteIndex; i < userCount; i++)
       {
-        if (deletedIndex[i] == decision - 1)
+        if (indices[i] == decision - 1)
         {
           // Shift the remaining users (delete user from actual list)
           for (int j = decision - 1; j < userCount - 1; j++)
@@ -564,9 +621,9 @@ void deleteByName()
       {
         // Start batch deletion
         int remainingCount = userCount;
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < result; i++)
         {
-          int deleteIndex = deletedIndex[i];
+          int deleteIndex = indices[i];
           // Adjust the list array to remove this index
           for (int j = deleteIndex; j < remainingCount - 1; j++)
           {
@@ -575,11 +632,11 @@ void deleteByName()
           remainingCount--; // Reduce the count after each deletion
 
           // Adjust subsequent deletedIndex values
-          for (int k = i + 1; k < index; k++)
+          for (int k = i + 1; k < result; k++)
           {
-            if (deletedIndex[k] > deleteIndex)
+            if (indices[k] > deleteIndex)
             {
-              deletedIndex[k]--; // Shift to the left for proper indices
+              indices[k]--; // Shift to the left for proper indices
             }
           }
         }
@@ -600,7 +657,7 @@ void deleteByName()
     }
   }
 
-  int dataToDelete = deletedIndex[0];
+  int dataToDelete = indices[0];
   for (int k = dataToDelete; k < userCount - 1; k++)
   {
     list[k] = list[k + 1];
@@ -657,6 +714,7 @@ int main()
 
     printf("Enter a number: ");
     scanf("%d", &decision);
+    getchar();
 
     // all main function going here
     switch (decision)
@@ -671,7 +729,7 @@ int main()
       deleteByName();
       break;
     case 4: // Search
-
+      searchContact();
       break;
     case 5: // Sort
       sortContact();
