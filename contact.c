@@ -297,7 +297,7 @@ void sortContact()
 }
 
 // display user
-void displayUser()
+int displayUser()
 {
   // if we get -1 means error occur
   int userCount = readFile("contact.txt", list, 80);
@@ -306,13 +306,13 @@ void displayUser()
   if (userCount == 0)
   {
     printf("No users. \n");
-    return;
+    return 1;
   }
 
   if (userCount < 0)
   { // error occur
     printf("Some error occurred when open the file");
-    return;
+    return 1;
   }
 
   printf(" %d users found:\n", userCount);
@@ -323,26 +323,15 @@ void displayUser()
   {
     printf("%d. %s %s  %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
   }
+
+  return userCount;
 }
 
 // edit user
 void editContact()
 {
-  // get the amount of user from file
-  int userCount = readFile("contact.txt", list, 80); // if we get -1 means error occur
-  // error handling
-  if (userCount == 0)
-  {
-    printf("No users in the file. \n");
-    return;
-  }
-  if (userCount < 0)
-  { // error occur
-    printf("Some error occurred when open the file");
-    return;
-  }
   // display the user so they can choose the contact to edit
-  displayUser();
+  int userCount = displayUser();
   // user input to edit the user
   int userToEdit;
   printf("Choose the index of the contact to edit: ");
@@ -478,6 +467,116 @@ void editContact()
   printf("Edit Successfully!\n");
 }
 
+// delete user
+void deleteByName()
+{
+  int userCount = displayUser();
+
+  while (getchar() != '\n')
+    ; // Flush leftover characters
+
+  // user input
+  char deletedName[MAX_PROPERTY_LENGTH];
+  printf("Enter new user's name: ");
+  fgets(deletedName, 50, stdin);
+
+  deletedName[strcspn(deletedName, "\n")] = '\0';
+
+  for (int j = 0; j < MAX_PROPERTY_LENGTH; j++)
+  {
+    deletedName[j] = tolower(deletedName[j]);
+  }
+
+  int found = 0; // use to record whether found the name in file,if not then print not found
+  // find the name in the array that same as user input's name
+  int deletedIndex[userCount]; // used to record the index of deleted contact
+  int index = 0;               // used to record deletedIndex array's index
+  printf("no. Name Phone Email");
+  for (int i = 0; i < userCount; i++)
+  {
+    if (strcmp(list[i].name, deletedName) == 0)
+    { // equal to 0 means same
+      printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
+      deletedIndex[index] = i;
+      index++;
+      found++;
+    }
+  }
+
+  if (found == 0)
+  { // if no contact found
+    printf("no contact found...");
+    return;
+  }
+
+  if (found > 1)
+  { // means only 1 contact found
+    printf("We found %d contact with same name would you like to delete 1 or all? ");
+    printf("1. One");
+    printf("2. All");
+
+    int deleteSelection;
+    scanf("%d", &deleteSelection);
+    getchar();
+
+    if (deleteSelection == 1)
+    { // ask user to choose one number from found contact list
+      int decision;
+      scanf("%d", &decision);
+      getchar();
+
+      for (int i = 0; i < index; i++)
+      {
+        if (deletedIndex[i] == decision - 1)
+        {
+          // Shift the remaining users (delete user from actual list)
+          for (int j = decision - 1; j < userCount - 1; j++)
+          {
+            list[j] = list[j + 1];
+          }
+          userCount--; // Decrease the count
+          printf("User '%s' deleted successfully.\n", deletedName);
+          saveToFileBatch(list, userCount);
+          return;
+        }
+      }
+    }
+    if (deleteSelection == 2)
+    {
+      printf("Delete confirmation (y/n): ");
+      char res;
+      scanf("%c", &res);
+      getchar();
+
+      switch (res)
+      {
+      case 'y':
+      case 'Y':
+        // delete all function goes here
+        break;
+      case 'n':
+      case 'N':
+        printf("Cancelled");
+        break;
+      default:
+        printf("Invalid Input!");
+        exit(1);
+      }
+      return; // to separate with delete single contact
+    }
+  }
+
+  int dataToDelete = deletedIndex[0];
+  for (int k = dataToDelete; k < userCount - 1; k++)
+  {
+    list[k] = list[k + 1];
+  }
+  userCount--;
+  printf("User '%s' deleted successfully.\n", deletedName);
+  saveToFileBatch(list, userCount);
+  return;
+}
+
 // clear contact
 void clearContact()
 {
@@ -535,7 +634,7 @@ int main()
       editContact();
       break;
     case 3: // Delete
-      // deleteByName();
+      deleteByName();
       break;
     case 4: // Search
 
