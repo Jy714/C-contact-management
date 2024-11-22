@@ -230,11 +230,7 @@ int readFile(const char *filename, User list[], int maxUsers)
     {
       count++;
     }
-    else
-    {
-      printf("Error");
     }
-  }
 
   fclose(file);
   return count; // Return the number of users read from file
