@@ -230,7 +230,7 @@ int readFile(const char *filename, User list[], int maxUsers)
     {
       count++;
     }
-    }
+  }
 
   fclose(file);
   return count; // Return the number of users read from file
@@ -332,7 +332,7 @@ int displayUser()
     return 1;
   }
 
-  printf(" %d users found:\n", userCount);
+  printf("%d users found:\n", userCount);
 
   printf("Name    Phone    Email\n");
   // loop to print the user
