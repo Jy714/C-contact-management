@@ -274,8 +274,15 @@ void sortContact()
     exit(1);
   }
 
-  for (int i = 0; i < userCount - 1; i++)
+  // here we using bubble sort to sort our list (improvement edition)
+  // this improvement is used if we have the array like this, is used to reduce execution time
+  // exp: 0 1 2 3 4 5 6 7 9 8
+  // only last 1 need to compare cuz b4 that all are ascending order
+  int flag = 1; // means true
+
+  for (int i = 0; i < userCount - 1 && flag; i++)
   {
+    flag = 0; // indicate that this loop is done sorting
     for (int j = 0; j < userCount - i - 1; j++)
     {
 
@@ -294,12 +301,14 @@ void sortContact()
         compareRes = strcmp(list[j].email, list[j + 1].email);
         break;
       }
-
+      // usage of flag: from here if the inner loop didn't enter the if statement (mean j less than j+1)
+      // it also means this loop already done sorting
       if (compareRes > 0)
       { // j greater than j+1
         User userTemp = list[j + 1];
         list[j + 1] = list[j];
         list[j] = userTemp;
+        flag = 1; // set to true
       }
     }
   }
