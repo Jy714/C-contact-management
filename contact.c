@@ -170,17 +170,17 @@ void addContact()
 
     if (phoneRes != 1 && emailRes != 1)
     {
-      printf("Phone number and email format is not correct!");
+      printf("Phone number and email format is not correct!\n");
       continue;
     }
     if (phoneRes != 1)
     {
-      printf("Phone number format is not correct!");
+      printf("Phone number format is not correct!\n");
       continue;
     }
     if (emailRes != 1)
     {
-      printf("Email format is not correct!");
+      printf("Email format is not correct!\n");
       continue;
     }
     saveToFile(user[i]);
@@ -477,7 +477,7 @@ void deleteByName()
 
   // user input
   char deletedName[MAX_PROPERTY_LENGTH];
-  printf("Enter new user's name: ");
+  printf("Enter name you would like to delete : ");
   fgets(deletedName, 50, stdin);
 
   deletedName[strcspn(deletedName, "\n")] = '\0';
@@ -491,7 +491,7 @@ void deleteByName()
   // find the name in the array that same as user input's name
   int deletedIndex[userCount]; // used to record the index of deleted contact
   int index = 0;               // used to record deletedIndex array's index
-  printf("no. Name Phone Email");
+  printf("no. Name Phone Email\n");
   for (int i = 0; i < userCount; i++)
   {
     if (strcmp(list[i].name, deletedName) == 0)
@@ -511,9 +511,10 @@ void deleteByName()
 
   if (found > 1)
   { // means only 1 contact found
-    printf("We found %d contact with same name would you like to delete 1 or all? ");
-    printf("1. One");
-    printf("2. All");
+    printf("We found %d contact with same name would you like to delete 1 or all? \n", found);
+    printf("1. One\n");
+    printf("2. All\n");
+    printf("User input: ");
 
     int deleteSelection;
     scanf("%d", &deleteSelection);
@@ -522,6 +523,7 @@ void deleteByName()
     if (deleteSelection == 1)
     { // ask user to choose one number from found contact list
       int decision;
+      printf("Which would you like to delete (index): ");
       scanf("%d", &decision);
       getchar();
 
@@ -552,8 +554,33 @@ void deleteByName()
       {
       case 'y':
       case 'Y':
-        // delete all function goes here
-        break;
+      {
+        // Start batch deletion
+        int remainingCount = userCount;
+        for (int i = 0; i < index; i++)
+        {
+          int deleteIndex = deletedIndex[i];
+          // Adjust the list array to remove this index
+          for (int j = deleteIndex; j < remainingCount - 1; j++)
+          {
+            list[j] = list[j + 1];
+          }
+          remainingCount--; // Reduce the count after each deletion
+
+          // Adjust subsequent deletedIndex values
+          for (int k = i + 1; k < index; k++)
+          {
+            if (deletedIndex[k] > deleteIndex)
+            {
+              deletedIndex[k]--; // Shift to the left for proper indices
+            }
+          }
+        }
+        userCount = remainingCount; // Update user count
+        printf("Users deleted successfully.\n");
+        saveToFileBatch(list, userCount);
+      }
+      break;
       case 'n':
       case 'N':
         printf("Cancelled");
