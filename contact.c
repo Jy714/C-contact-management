@@ -39,6 +39,7 @@ void searchContact();
 void deleteByName();
 void clearContact();
 void readLine(char *buffer, int size);
+void restoreContact();
 
 // read a line safety
 void readLine(char *buffer, int size)
@@ -60,8 +61,9 @@ void showMenu()
   printf("============ 4. Search Contact  ============\n");
   printf("============ 5. Sort Contact    ============\n");
   printf("============ 6. Display Contact ============\n");
-  printf("============ 7. Clear Contact   ============\n");
-  printf("============ 8. Exit            ============\n");
+  printf("============ 7. Restore Contact ============\n");
+  printf("============ 8. Clear Contact   ============\n");
+  printf("============ 9. Exit            ============\n");
   printf("============================================\n");
 }
 
@@ -134,7 +136,6 @@ int saveToFile(User user)
   // file open successfully, now we need to write into the file
   fprintf(out, "\n%s %s %s", user.name, user.phone, user.email);
   fclose(out);
-  printf("User added successfully\n");
   return 1; // task terminate successfully
 }
 
@@ -693,6 +694,8 @@ void deleteByName()
   }
 
   int dataToDelete = indices[0];
+  // store the user into the restoreUserList
+  restoreList[count++] = list[dataToDelete];
   for (int k = dataToDelete; k < userCount - 1; k++)
   {
     list[k] = list[k + 1];
@@ -741,6 +744,53 @@ void clearContact()
 // restore contact (data will lost if program terminates)
 void restoreContact()
 {
+
+  if (count <= 0)
+  {
+    printf("No users found!\n");
+    return;
+  }
+  printf("Total of %d user in the list:\n", count);
+
+  printf("no. Name Phone Email\n");
+  for (int i = 0; i < count; i++)
+  {
+    printf("%d. %s %s %s\n", i + 1, restoreList[i].name, restoreList[i].phone, restoreList[i].email);
+  }
+
+  printf("Which user you would like to restore (index, -1 to cancel):");
+  int choice;
+  scanf("%d", &choice);
+  getchar();
+  // if user input -1
+  if (choice == -1)
+  {
+    printf("Cancelled\n");
+    return;
+  }
+
+  if (choice < -1 || choice > count)
+  {
+    printf("Invalid input!\n");
+    return;
+  }
+
+  // restore user to file
+  int restoreIndex = choice - 1;
+
+  char restoredName[MAX_PROPERTY_LENGTH];
+  strcpy(restoredName, restoreList[restoreIndex].name);
+
+  // save the restore user to the file
+  saveToFile(restoreList[restoreIndex]);
+
+  // Shift the remaining users (delete user from restore list)
+  for (int i = restoreIndex; i < count - 1; i++)
+  {
+    restoreList[i] = restoreList[i + 1];
+  }
+  count--; // Decrease the count
+  printf("User '%s' restored successfully.\n", restoredName);
 }
 
 int main()
@@ -777,10 +827,13 @@ int main()
     case 6: // Display
       displayUser();
       break;
-    case 7: // Clear
+    case 7: // restore
+      restoreContact();
+      break;
+    case 8: // Clear
       clearContact();
       break;
-    case 8: // exit
+    case 9: // exit
       printf("Thank for using. Please visit us again\n");
       exit(0); // exit with successfully (0 mean success | 1 mean failed)
     default:
