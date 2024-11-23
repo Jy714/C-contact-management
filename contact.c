@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 #define MAX_LENGTH 150
 #define MAX_PROPERTY_LENGTH 50
 #define MAX_USERS 80
+#define ENCRYPT_VAL 3
 
 // user info
 typedef struct
@@ -20,6 +22,9 @@ User list[MAX_USERS];
 // used to store user that deleted, so we can restore the value
 User restoreList[MAX_USERS];
 int count = 0; // used to record the index of restoreList
+
+// use for data encryption and decryption
+const char salt[] = "GRPFLU";
 
 // functions prototype
 void showMenu();
@@ -40,6 +45,37 @@ void deleteByName();
 void clearContact();
 void readLine(char *buffer, int size);
 void restoreContact();
+
+// data encryption
+void dataEncryption(User *user)
+{
+  // encryption format: salt + value, then each character + 3(we defined this value ourselves)
+  char temp[MAX_PROPERTY_LENGTH];
+  // 1. salt + value
+  // name
+  strcpy(temp, salt);
+  strcat(temp, user->name);
+  // strcat(temp, salt); // Append name to salt user-> name == *user.name
+  for (int i = 0; i < strlen(temp); i++)
+    temp[i] = temp[i] + ENCRYPT_VAL;
+  strcpy(user->name, temp); // Save back the encrypted name
+
+  // phone
+  strcpy(temp, salt);
+  strcat(temp, user->phone);
+  // strcat(temp, salt);
+  for (int i = 0; i < strlen(temp); i++)
+    temp[i] = temp[i] + ENCRYPT_VAL;
+  strcpy(user->phone, temp); // Save back the encrypted phone
+
+  // email
+  strcpy(temp, salt);
+  strcat(temp, user->email);
+  // strcat(temp, salt);
+  for (int i = 0; i < strlen(temp); i++)
+    temp[i] = temp[i] + ENCRYPT_VAL;
+  strcpy(user->email, temp); // Save back the encrypted email
+}
 
 // read a line safety
 void readLine(char *buffer, int size)
@@ -133,6 +169,9 @@ int saveToFile(User user)
     return -1;
   }
 
+  // encrypt data before write into the files
+  dataEncryption(&user);
+
   // file open successfully, now we need to write into the file
   fprintf(out, "\n%s %s %s", user.name, user.phone, user.email);
   fclose(out);
@@ -152,6 +191,8 @@ int saveToFileBatch(User *user, int number)
   }
   for (int i = 0; i < number; i++)
   {
+    dataEncryption(&user[i]);
+
     // file open successfully, now we need to write into the file
     fprintf(out, "\n%s %s %s", user[i].name, user[i].phone, user[i].email);
   }
