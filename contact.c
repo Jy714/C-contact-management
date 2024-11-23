@@ -17,6 +17,10 @@ typedef struct
 // used for sorting
 User list[MAX_USERS];
 
+// used to store user that deleted, so we can restore the value
+User restoreList[MAX_USERS];
+int count = 0; // used to record the index of restoreList
+
 // functions prototype
 void showMenu();
 void toLowerCase(char str[]);
@@ -613,6 +617,15 @@ void deleteByName()
       {
         if (indices[i] == decision - 1)
         {
+          // store the user into the restoreUserList
+          restoreList[count++] = list[i];
+
+          // // print the restore List (debug purposes)
+          // for (int k = 0; k < count; k++)
+          // {
+          //   printf("%s %s %s\n", restoreList[k].name, restoreList[k].phone, restoreList[k].email);
+          // }
+
           // Shift the remaining users (delete user from actual list)
           for (int j = decision - 1; j < userCount - 1; j++)
           {
@@ -642,6 +655,9 @@ void deleteByName()
         for (int i = 0; i < result; i++)
         {
           int deleteIndex = indices[i];
+          // add the deleted user into the restore list
+          restoreList[count++] = list[deleteIndex];
+
           // Adjust the list array to remove this index
           for (int j = deleteIndex; j < remainingCount - 1; j++)
           {
@@ -660,6 +676,7 @@ void deleteByName()
         }
         userCount = remainingCount; // Update user count
         printf("Users deleted successfully.\n");
+
         saveToFileBatch(list, userCount);
       }
       break;
@@ -719,6 +736,11 @@ void clearContact()
   default:
     printf("Invalid input\n");
   }
+}
+
+// restore contact (data will lost if program terminates)
+void restoreContact()
+{
 }
 
 int main()
