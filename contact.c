@@ -4,6 +4,7 @@
 #include <ctype.h>
 #define MAX_LENGTH 150
 #define MAX_PROPERTY_LENGTH 50
+#define MAX_USERS 80
 
 // user info
 typedef struct
@@ -14,9 +15,35 @@ typedef struct
 } User;
 
 // used for sorting
-User list[80];
+User list[MAX_USERS];
 
-// functions prototype TODO
+// functions prototype
+void showMenu();
+void toLowerCase(char str[]);
+void printList(int userCount);
+int isValidEmail(char email[]);
+int isValidNumber(char number[]);
+int saveToFile(User user);
+int saveToFileBatch(User *user, int number);
+void addContact();
+int readFile(const char *filename, User list[], int maxUsers);
+void sortContact();
+int displayUser();
+void editContact();
+int searchContactByName(const char *name, int *indices, int maxIndices);
+void searchContact();
+void deleteByName();
+void clearContact();
+void readLine(char *buffer, int size);
+
+// read a line safety
+void readLine(char *buffer, int size)
+{
+  if (fgets(buffer, size, stdin))
+  {
+    buffer[strcspn(buffer, "\n")] = '\0'; // Remove newline
+  }
+}
 
 // Landing page
 void showMenu()
@@ -55,23 +82,13 @@ void printList(int userCount)
 // Function to validate email Need to change
 int isValidEmail(char email[])
 {
-  int aSymbol = 0;
-  int dot = 0;
-  char *atLocation = NULL;
-
-  // Check if there is an '@' symbol and at least one '.'
-  atLocation = strchr(email, '@'); // Find the first '@' symbol
-  if (atLocation != NULL)
+  char *aSymbol = strchr(email, '@'); // check for first occurrence
+  char *dot = strrchr(email, '.');    // check for last occurrence
+  if (aSymbol && dot && aSymbol < dot && aSymbol != email && dot != email + strlen(email) - 1)
   {
-    aSymbol = 1;
-    // Check if there's a dot after '@'
-    if (strchr(atLocation, '.') != NULL)
-    {
-      dot = 1;
-    }
+    return 1; // Valid email
   }
-  // Return true if both '@' and '.' exist and '@' comes before '.'
-  return (aSymbol && dot);
+  return 0; // Invalid email
 }
 
 // Function to validate contact number (based on Malaysia phone number)
@@ -80,14 +97,9 @@ int isValidNumber(char number[])
   // malaysia phone number is between 9-12 number
   int length = strlen(number);
 
-  if (length < 9 || length > 12)
+  if ((length < 9 || length > 12) || (strncmp(number, "601", 3) != 0))
   {
     return 0; // false
-  }
-
-  if (number[0] != '6' || number[1] != '0' || number[2] != '1')
-  { // malaysia phone number start from 601xxxxxx
-    return 0;
   }
 
   // check if the left part of number array is digit of not
@@ -107,41 +119,39 @@ int isValidNumber(char number[])
 int saveToFile(User user)
 {
   // declare an output file pointer
-  FILE *out;
+  FILE *out = fopen("contact.txt", "a");
 
-  if ((out = fopen("contact.txt", "a")) == NULL)
-  {
+  if (!out)
+  { // out == 0
     printf("Error when opening the file");
-    exit(1);
+    return -1;
   }
 
   // file open successfully, now we need to write into the file
   fprintf(out, "\n%s %s %s", user.name, user.phone, user.email);
-
-  printf("User added successfully\n");
-
   fclose(out);
+  printf("User added successfully\n");
+  return 1; // task terminate successfully
 }
 
 // save to file function batch
 int saveToFileBatch(User *user, int number)
 {
   // declare an output file pointer
-  FILE *out;
+  FILE *out = fopen("contact.txt", "w");
 
-  if ((out = fopen("contact.txt", "w")) == NULL)
+  if (!out)
   {
     printf("Error when opening the file");
-    exit(1);
+    return -1;
   }
-
   for (int i = 0; i < number; i++)
   {
     // file open successfully, now we need to write into the file
     fprintf(out, "\n%s %s %s", user[i].name, user[i].phone, user[i].email);
   }
-
   fclose(out);
+  return 1;
 }
 
 // Add new contact
@@ -149,48 +159,40 @@ void addContact()
 {
   int num;
 
-  printf("Enter number of user you like to add (max:80): ");
+  printf("Enter number of user you like to add (max:%d): ", MAX_USERS);
   // less than 100 user in a time
-  scanf("%2d", &num);
-
+  scanf("%d", &num);
   // Clear the input buffer to avoid issues with fgets
   // Exp: Enter user's name: Enter user's phone number:
-  while (getchar() != '\n')
-    ;
+  getchar();
 
   // error handling with invalid input
-  if (num <= 0 || num > 80)
+  if (num <= 0 || num > MAX_USERS)
   {
-    printf("Invalid Input!\n");
+    printf("Invalid number of users!\n");
     return;
   }
 
-  User user[80];
-
   for (int i = 0; i < num; i++)
   {
+    User user;
     printf("Contact %d: \n", i + 1);
     printf("Enter user's name: ");
-    fgets(user[i].name, 50, stdin);
+    readLine(user.name, sizeof(user.name));
 
     printf("Enter user's phone number (601xxxxxx): ");
-    fgets(user[i].phone, 20, stdin);
+    readLine(user.phone, sizeof(user.phone));
 
     printf("Enter user's Email: ");
-    fgets(user[i].email, 50, stdin);
-
-    // replace the newline to null terminator
-    user[i].name[strcspn(user[i].name, "\n")] = '\0';
-    user[i].email[strcspn(user[i].email, "\n")] = '\0';
-    user[i].phone[strcspn(user[i].phone, "\n")] = '\0';
+    readLine(user.email, sizeof(user.email));
 
     // in order to make the comparison (sort) easier and fair, we decided to convert the strings to lowerCase
-    toLowerCase(user[i].name);
-    toLowerCase(user[i].email);
+    toLowerCase(user.name);
+    toLowerCase(user.email);
 
     // input validate (pass == 1  fail == 0)
-    int emailRes = isValidEmail(user[i].email);
-    int phoneRes = isValidNumber(user[i].phone);
+    int emailRes = isValidEmail(user.email);
+    int phoneRes = isValidNumber(user.phone);
 
     if (phoneRes != 1 && emailRes != 1)
     {
@@ -207,7 +209,16 @@ void addContact()
       printf("Email format is not correct!\n");
       continue;
     }
-    saveToFile(user[i]);
+
+    // error handling for saveToFile function
+    if (saveToFile(user) > 0)
+    {
+      printf("User added successfully!\n");
+    }
+    else
+    {
+      printf("Failed to add user,Please try again...\n");
+    }
   }
 }
 
@@ -215,7 +226,7 @@ void addContact()
 int readFile(const char *filename, User list[], int maxUsers)
 {
   FILE *file = fopen(filename, "r");
-  if (file == NULL)
+  if (!file)
   {
     return -1; // Return error code
   }
@@ -453,17 +464,17 @@ void editContact()
     if (phoneRes != 1 && emailRes != 1)
     {
       printf("Phone number and email format are not correct!");
-      exit(1);
+      return;
     }
     if (phoneRes != 1)
     {
       printf("Phone number format is not correct!");
-      exit(1);
+      return;
     }
     if (emailRes != 1)
     {
       printf("Email format is not correct!");
-      exit(1);
+      return;
     }
 
     strcpy(list[userToEdit - 1].name, newName);
@@ -473,7 +484,7 @@ void editContact()
   }
   default:
     printf("Invalid input!\n");
-    exit(1);
+    return;
   }
 
   // write new result into the file
@@ -751,7 +762,7 @@ int main()
       printf("Thank for using. Please visit us again\n");
       exit(0); // exit with successfully (0 mean success | 1 mean failed)
     default:
-      printf("Invalid number, please enter again\n");
+      printf("Invalid choice, please enter again\n");
       return 0;
     }
   }

@@ -2,6 +2,7 @@
   "files.associations": {
     "*.ejs": "html",
     "typeinfo": "c",
-    "regex": "c"
+    "regex": "c",
+    "array": "c"
   }
 }
