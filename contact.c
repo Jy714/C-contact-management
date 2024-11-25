@@ -170,7 +170,7 @@ int saveToFile(User user)
   }
 
   // encrypt data before write into the files
-  dataEncryption(&user);
+  // dataEncryption(&user);
 
   // file open successfully, now we need to write into the file
   fprintf(out, "\n%s %s %s", user.name, user.phone, user.email);
@@ -191,7 +191,7 @@ int saveToFileBatch(User *user, int number)
   }
   for (int i = 0; i < number; i++)
   {
-    dataEncryption(&user[i]);
+    // dataEncryption(&user[i]);
 
     // file open successfully, now we need to write into the file
     fprintf(out, "\n%s %s %s", user[i].name, user[i].phone, user[i].email);
@@ -659,6 +659,8 @@ void deleteByName()
       {
         if (indices[i] == decision - 1)
         {
+          char returnName[MAX_PROPERTY_LENGTH];
+          strcpy(returnName, list[i].name);
           // store the user into the restoreUserList
           restoreList[count++] = list[i];
 
@@ -674,7 +676,7 @@ void deleteByName()
             list[j] = list[j + 1];
           }
           userCount--; // Decrease the count
-          printf("User '%s' deleted successfully.\n", deletedName);
+          printf("User '%s' deleted successfully.\n", returnName);
           saveToFileBatch(list, userCount);
           return;
         }
