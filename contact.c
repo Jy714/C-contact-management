@@ -274,25 +274,71 @@ int readFile(const char *filename, User list[], int maxUsers)
   FILE *file = fopen(filename, "r");
   if (!file)
   {
-    return -1; // Return error code
+    return -1; // Return error code if file cannot be opened
   }
 
-  char line[MAX_LENGTH]; // number of char that a line can store
-  int count = 0;         // used to record the index of list array
+  char line[MAX_LENGTH]; // Buffer to store each line from the file
+  int count = 0;         // Counter for the number of users
 
   while (fgets(line, sizeof(line), file) && count < maxUsers)
   {
-    // store it in the struct array (list)
-    if (sscanf(line, "%49s %19s %49s", list[count].name, list[count].phone, list[count].email) == 3)
+    char tempName[MAX_LENGTH] = ""; // Temporary variable for storing name
+    char tempPhone[20] = "";        // Temporary variable for phone
+    char tempEmail[50] = "";        // Temporary variable for email
+
+    // Split the line into tokens
+    char *token = strtok(line, " \n");
+    int tokenCount = 0;
+
+    char *tokens[MAX_LENGTH / 2]; // Array to hold tokens for processing
+
+    // Collect all tokens in the line
+    while (token != NULL)
     {
-      count++;
+      tokens[tokenCount++] = token;
+      token = strtok(NULL, " \n");
     }
+
+    // Ensure there are at least 3 tokens for a valid line
+    if (tokenCount < 3)
+    {
+      continue; // Skip invalid lines
+    }
+
+    // Extract phone and email from the last two tokens
+    strncpy(tempPhone, tokens[tokenCount - 2], sizeof(tempPhone) - 1);
+    strncpy(tempEmail, tokens[tokenCount - 1], sizeof(tempEmail) - 1);
+
+    // Combine remaining tokens into the name
+    tempName[0] = '\0'; // Start with an empty string
+    for (int i = 0; i < tokenCount - 2; i++)
+    {
+      strncat(tempName, tokens[i], sizeof(tempName) - strlen(tempName) - 1);
+      if (i < tokenCount - 3)
+      {
+        strncat(tempName, " ", sizeof(tempName) - strlen(tempName) - 1);
+      }
+    }
+
+    // Trim trailing whitespace from name
+    tempName[strcspn(tempName, "\n")] = '\0';
+
+    // Store the parsed values in the list
+    strncpy(list[count].name, tempName, sizeof(list[count].name) - 1);
+    strncpy(list[count].phone, tempPhone, sizeof(list[count].phone) - 1);
+    strncpy(list[count].email, tempEmail, sizeof(list[count].email) - 1);
+
+    // Ensure null termination
+    list[count].name[sizeof(list[count].name) - 1] = '\0';
+    list[count].phone[sizeof(list[count].phone) - 1] = '\0';
+    list[count].email[sizeof(list[count].email) - 1] = '\0';
+
+    count++;
   }
 
   fclose(file);
   return count; // Return the number of users read from file
 }
-
 // Sort
 // Function of bubble sort for contact name
 void sortContact()
@@ -421,7 +467,7 @@ void editContact()
   if (userToEdit < 1 || userToEdit > userCount)
   {
     printf("Invalid input!\n");
-    exit(1); // exit with error
+    return; // exit with error
   }
   // ask user want to edit name / phone / email / all
   printf("1. Name\n");
@@ -737,6 +783,9 @@ void deleteByName()
   }
 
   int dataToDelete = indices[0];
+  // copy the name of deleted user
+  char userDeletedName[MAX_PROPERTY_LENGTH];
+  strcpy(userDeletedName, list[dataToDelete].name);
   // store the user into the restoreUserList
   restoreList[count++] = list[dataToDelete];
   for (int k = dataToDelete; k < userCount - 1; k++)
@@ -744,7 +793,7 @@ void deleteByName()
     list[k] = list[k + 1];
   }
   userCount--;
-  printf("User '%s' deleted successfully.\n", deletedName);
+  printf("User '%s' deleted successfully.\n", userDeletedName);
   saveToFileBatch(list, userCount);
   return;
 }
