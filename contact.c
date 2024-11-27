@@ -277,20 +277,20 @@ int readFile(const char *filename, User list[], int maxUsers)
     return -1; // Return error code if file cannot be opened
   }
 
-  char line[MAX_LENGTH]; // Buffer to store each line from the file
-  int count = 0;         // Counter for the number of users
+  char line[MAX_LENGTH];
+  int count = 0; // Counter for the number of users
 
   while (fgets(line, sizeof(line), file) && count < maxUsers)
   {
-    char tempName[MAX_LENGTH] = ""; // Temporary variable for storing name
-    char tempPhone[20] = "";        // Temporary variable for phone
-    char tempEmail[50] = "";        // Temporary variable for email
+    char tempName[MAX_LENGTH] = "";
+    char tempPhone[20] = "";
+    char tempEmail[50] = "";
 
     // Split the line into tokens
     char *token = strtok(line, " \n");
     int tokenCount = 0;
 
-    char *tokens[MAX_LENGTH / 2]; // Array to hold tokens for processing
+    char *tokens[MAX_LENGTH / 2]; // Array to hold tokens
 
     // Collect all tokens in the line
     while (token != NULL)
@@ -305,7 +305,7 @@ int readFile(const char *filename, User list[], int maxUsers)
       continue; // Skip invalid lines
     }
 
-    // Extract phone and email from the last two tokens
+    //  extract phone and email from the line (last two is phone and email)
     strncpy(tempPhone, tokens[tokenCount - 2], sizeof(tempPhone) - 1);
     strncpy(tempEmail, tokens[tokenCount - 1], sizeof(tempEmail) - 1);
 
@@ -320,15 +320,13 @@ int readFile(const char *filename, User list[], int maxUsers)
       }
     }
 
-    // Trim trailing whitespace from name
     tempName[strcspn(tempName, "\n")] = '\0';
 
-    // Store the parsed values in the list
     strncpy(list[count].name, tempName, sizeof(list[count].name) - 1);
     strncpy(list[count].phone, tempPhone, sizeof(list[count].phone) - 1);
     strncpy(list[count].email, tempEmail, sizeof(list[count].email) - 1);
 
-    // Ensure null termination
+    // Confirm null termination
     list[count].name[sizeof(list[count].name) - 1] = '\0';
     list[count].phone[sizeof(list[count].phone) - 1] = '\0';
     list[count].email[sizeof(list[count].email) - 1] = '\0';
