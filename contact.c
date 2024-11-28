@@ -53,6 +53,7 @@ void printLogo();
 void printLogo()
 {
   printf("\n\n");
+
   // Print the word "FLUTTERSHY" in pink
   printf("  FFFFFFF  L         U   U  TTTTT   TTTTT  EEEEE  RRRRR    SSSS   H   H   Y   Y\n");
   printf("  F        L         U   U    T       T    E      R   R   S       H   H    Y Y\n");
@@ -288,34 +289,40 @@ void addContact()
     printf("Enter user's name: ");
     readLine(user.name, sizeof(user.name));
 
-    printf("Enter user's phone number (601xxxxxx): ");
-    readLine(user.phone, sizeof(user.phone));
-
-    printf("Enter user's Email: ");
-    readLine(user.email, sizeof(user.email));
-
     // in order to make the comparison (sort) easier and fair, we decided to convert the strings to lowerCase
     toLowerCase(user.name);
-    toLowerCase(user.email);
 
-    // input validate (pass == 1  fail == 0)
-    int emailRes = isValidEmail(user.email);
-    int phoneRes = isValidNumber(user.phone);
+    while (1)
+    {
+      printf("Enter user's phone number (601xxxxxx): ");
+      readLine(user.phone, sizeof(user.phone));
+      int phoneRes = isValidNumber(user.phone); // input validate (pass == 1  fail == 0)
+      if (phoneRes != 1)
+      {
+        printf("Phone number format is not correct!\n");
+      }
+      else
+      {
+        break;
+      }
+    }
 
-    if (phoneRes != 1 && emailRes != 1)
+    while (1)
     {
-      printf("Phone number and email format is not correct!\n");
-      continue;
-    }
-    if (phoneRes != 1)
-    {
-      printf("Phone number format is not correct!\n");
-      continue;
-    }
-    if (emailRes != 1)
-    {
-      printf("Email format is not correct!\n");
-      continue;
+      printf("Enter user's Email: ");
+      readLine(user.email, sizeof(user.email));
+      // in order to make the comparison (sort) easier and fair, we decided to convert the strings to lowerCase
+      toLowerCase(user.email);
+      int emailRes = isValidEmail(user.email); // input validate (pass == 1  fail == 0)
+
+      if (emailRes != 1)
+      {
+        printf("Email format is not correct!\n");
+      }
+      else
+      {
+        break;
+      }
     }
 
     // error handling for saveToFile function
