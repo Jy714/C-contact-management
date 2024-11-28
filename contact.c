@@ -47,6 +47,21 @@ void readLine(char *buffer, int size);
 void restoreContact();
 void dataEncryption(User *user);
 void dataDecryption(User *user, int count);
+void printLogo();
+
+// print LOGO when program start
+void printLogo()
+{
+  const char *PINK = "\033[38;2;241;175;211m"; // light pink
+  const char *RESET = "\033[0m";               // Reset color to default color
+
+  // Print the word "FLUTTERSHY" in pink
+  printf("%s  FFFFFFF  L         U   U  TTTTT   TTTTT  EEEEE  RRRRR    SSSS   H   H   Y   Y\n", PINK);
+  printf("  F        L         U   U    T       T    E      R   R   S       H   H    Y Y\n");
+  printf("  FFFFF    L         U   U    T       T    EEEE   RRRRR    SSSS    HHHH     Y\n");
+  printf("  F        L         U   U    T       T    E      R  R        S   H   H     Y\n");
+  printf("  F        LLLLL     UUUUU    T       T    EEEEE  R   R   SSSS    H    H    Y\n %s", RESET);
+}
 
 // data encryption
 void dataEncryption(User *user)
@@ -934,6 +949,9 @@ void restoreContact()
 
 int main()
 {
+  // print out the logo
+  printLogo();
+
   // used to record the decision
   int decision;
 
