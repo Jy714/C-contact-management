@@ -45,6 +45,8 @@ void deleteByName();
 void clearContact();
 void readLine(char *buffer, int size);
 void restoreContact();
+void dataEncryption(User *user);
+void dataDecryption(User *user, int count);
 
 // data encryption
 void dataEncryption(User *user)
@@ -75,6 +77,49 @@ void dataEncryption(User *user)
   for (int i = 0; i < strlen(temp); i++)
     temp[i] = temp[i] + ENCRYPT_VAL;
   strcpy(user->email, temp); // Save back the encrypted email
+}
+
+//  data decryption
+void dataDecryption(User *user, int count)
+{
+  char temp[MAX_PROPERTY_LENGTH];
+  int saltLength = strlen(salt);
+
+  for (int i = 0; i < count; i++)
+  {
+    // name
+    strcpy(temp, user[i].name);
+    for (int j = 0; j < strlen(temp); j++)
+    {
+      temp[j] = temp[j] - ENCRYPT_VAL;
+    }
+    temp[strlen(temp)] = '\0';
+    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt
+    strncpy(user[i].name, temp, sizeof(user[i].name) - 1);
+    user[i].name[sizeof(user[i].name) - 1] = '\0';
+
+    // phone
+    strcpy(temp, user[i].phone);
+    for (int j = 0; j < strlen(temp); j++)
+    {
+      temp[j] = temp[j] - ENCRYPT_VAL;
+    }
+    temp[strlen(temp)] = '\0';
+    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt
+    strncpy(user[i].phone, temp, sizeof(user[i].phone) - 1);
+    user[i].phone[sizeof(user[i].phone) - 1] = '\0';
+
+    // email
+    strcpy(temp, user[i].email);
+    for (int j = 0; j < strlen(temp); j++)
+    {
+      temp[j] = temp[j] - ENCRYPT_VAL;
+    }
+    temp[strlen(temp)] = '\0';
+    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt
+    strncpy(user[i].email, temp, sizeof(user[i].email) - 1);
+    user[i].email[sizeof(user[i].email) - 1] = '\0';
+  }
 }
 
 // read a line safety
@@ -170,7 +215,7 @@ int saveToFile(User user)
   }
 
   // encrypt data before write into the files
-  // dataEncryption(&user);
+  dataEncryption(&user);
 
   // file open successfully, now we need to write into the file
   fprintf(out, "\n%s %s %s", user.name, user.phone, user.email);
@@ -191,7 +236,7 @@ int saveToFileBatch(User *user, int number)
   }
   for (int i = 0; i < number; i++)
   {
-    // dataEncryption(&user[i]);
+    dataEncryption(&user[i]);
 
     // file open successfully, now we need to write into the file
     fprintf(out, "\n%s %s %s", user[i].name, user[i].phone, user[i].email);
@@ -334,9 +379,12 @@ int readFile(const char *filename, User list[], int maxUsers)
     count++;
   }
 
+  dataDecryption(list, count);
+
   fclose(file);
   return count; // Return the number of users read from file
 }
+
 // Sort
 // Function of bubble sort for contact name
 void sortContact()
