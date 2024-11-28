@@ -437,7 +437,7 @@ void sortContact()
   if (res < 1 || res > 3)
   {
     printf("Invalid input");
-    exit(1);
+    return;
   }
 
   // here we using bubble sort to sort our list (improvement edition)
@@ -565,7 +565,7 @@ void editContact()
     if (phoneRes != 1)
     {
       printf("Phone number format is not correct!");
-      exit(1);
+      return;
     }
 
     strcpy(list[userToEdit - 1].phone, newPhone);
@@ -583,7 +583,7 @@ void editContact()
     if (emailRes != 1)
     {
       printf("Email format is not correct!");
-      exit(1);
+      return;
     }
 
     toLowerCase(newEmail);
