@@ -462,13 +462,13 @@ void sortContact()
     }
   }
 
-  // update into files
-  saveToFileBatch(list, userCount);
-
   printf("User after sorted\n");
   printf("no. Name Phone Email\n");
 
   printList(userCount);
+
+  // update into files
+  saveToFileBatch(list, userCount);
 }
 
 // display user
