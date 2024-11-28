@@ -8,6 +8,9 @@
 #define MAX_USERS 80
 #define ENCRYPT_VAL 3
 
+#define LIGHT_PINK "\033[38;2;241;175;211m" // ANSI escape codes for purple colors
+#define RESET_COLOR "\033[0m"               // ANSI reset to default
+
 // user info
 typedef struct
 {
@@ -61,6 +64,19 @@ void printLogo()
   printf("  F        L         U   U    T       T    E      R  R        S   H   H     Y\n");
   printf("  F        LLLLL     UUUUU    T       T    EEEEE  R   R   SSSS    H    H    Y\n ");
 }
+
+// void printLogo()
+// {
+//   // Print the logo
+//   printf(LIGHT_PINK); // print FLUTTERSHY with purple
+//   printf("\n\n");
+//   printf("  FFFFFFF  L       U   U  TTTTTTT TTTTTTT  EEEEE   RRRRR    SSSS   H   H   Y   Y\n");
+//   printf("  F        L       U   U     T       T     E       R   R   S       H   H    Y Y\n");
+//   printf("  FFFFF    L       U   U     T       T     EEEE    RRRRR    SSS    HHHHH     Y\n");
+//   printf("  F        L       U   U     T       T     E       R  R        S   H   H     Y\n");
+//   printf("  F        LLLLL   UUUUU     T       T     EEEEE   R   R   SSSS    H   H     Y\n");
+//   printf(RESET_COLOR); // Reset the color to default a
+// }
 
 // data encryption
 void dataEncryption(User *user)
