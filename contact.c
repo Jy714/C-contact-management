@@ -160,9 +160,13 @@ void toLowerCase(char str[])
 // used to print the list
 void printList(int userCount)
 {
+  // Header
+  printf("%-5s %-25s %-15s %-30s\n", "no.", "Name", "Phone", "Email");
+  printf("-----------------------------------------------------------------------------\n");
+
   for (int i = 0; i < userCount; i++)
   {
-    printf("%d. %s %s %s\n", i + 1, list[i].name, list[i].phone, list[i].email);
+    printf("%-5d %-25s %-15s %-30s\n", i + 1, list[i].name, list[i].phone, list[i].email);
   }
 }
 
@@ -463,8 +467,6 @@ void sortContact()
   }
 
   printf("User after sorted\n");
-  printf("no. Name Phone Email\n");
-
   printList(userCount);
 
   // update into files
@@ -492,7 +494,6 @@ int displayUser()
 
   printf("%d users found:\n", userCount);
 
-  printf("Name    Phone    Email\n");
   // loop to print the user
   printList(userCount);
 
@@ -652,7 +653,7 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
   toLowerCase(searchName);
 
   int found = 0;
-  printf("no. Name Phone Email\n");
+  // printf("no. Name Phone Email\n");
   for (int i = 0; i < userCount; i++)
   {
     char lowerName[MAX_PROPERTY_LENGTH];
@@ -822,7 +823,7 @@ void deleteByName()
         break;
       default:
         printf("Invalid Input!");
-        exit(1);
+        return;
       }
       return; // to separate with delete single contact
     }
