@@ -122,12 +122,12 @@ void dataDecryption(User *user, int count)
     strcpy(temp, user[i].name);
     for (int j = 0; j < strlen(temp); j++)
     {
-      temp[j] = temp[j] - ENCRYPT_VAL;
+      temp[j] = temp[j] - ENCRYPT_VAL; // when encrypt, we + ENCRYPT_VAL at each character before store into the file
     }
-    temp[strlen(temp)] = '\0';
-    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt
-    strncpy(user[i].name, temp, sizeof(user[i].name) - 1);
-    user[i].name[sizeof(user[i].name) - 1] = '\0';
+    temp[strlen(temp)] = '\0';                                       // put a null terminator at last index
+    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt exp: salttest -> test
+    strncpy(user[i].name, temp, sizeof(user[i].name) - 1);           // copy the value without salt into the target list
+    user[i].name[sizeof(user[i].name) - 1] = '\0';                   // put null terminator at last index
 
     // phone
     strcpy(temp, user[i].phone);
@@ -136,7 +136,7 @@ void dataDecryption(User *user, int count)
       temp[j] = temp[j] - ENCRYPT_VAL;
     }
     temp[strlen(temp)] = '\0';
-    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt
+    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1);
     strncpy(user[i].phone, temp, sizeof(user[i].phone) - 1);
     user[i].phone[sizeof(user[i].phone) - 1] = '\0';
 
@@ -147,7 +147,7 @@ void dataDecryption(User *user, int count)
       temp[j] = temp[j] - ENCRYPT_VAL;
     }
     temp[strlen(temp)] = '\0';
-    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1); // Remove salt
+    memmove(temp, temp + saltLength, strlen(temp) - saltLength + 1);
     strncpy(user[i].email, temp, sizeof(user[i].email) - 1);
     user[i].email[sizeof(user[i].email) - 1] = '\0';
   }
@@ -294,10 +294,16 @@ int countFileUser()
 
   while (fgets(line, sizeof(line), file))
   {
-    userCount++;
+    userCount++; // caused by this, it will increment by 1 at the last line
   }
 
-  return userCount - 1;
+  // when file is empty, return 0, if not it will return -1( 0-1 )
+  if (userCount == 0)
+  {
+    return 0;
+  }
+
+  return userCount - 1; // if not, then 80 users userCount will show 81
 }
 
 // Add new contact
@@ -308,17 +314,18 @@ void addContact()
 
   if (userCount < 0)
   {
+    printf("Error occur when opening file...\n");
     return;
   }
 
   // if userCount >80
   if (userCount >= MAX_USERS)
   {
-    printf("you have reach maximum amount of contacts!");
+    printf("you have reach maximum amount of contacts!\n");
     return;
   }
 
-  printf("Enter number of user you like to add (max:%d): ", MAX_USERS);
+  printf("Enter number of user you like to add (max:%d)\n", MAX_USERS);
   printf("(current number available: %d/80): ", MAX_USERS - userCount);
   // less than 100 user in a time
   scanf("%d", &num);
@@ -329,7 +336,7 @@ void addContact()
   // error handling
   if (userCount + num > MAX_USERS)
   {
-    printf("You have reach maximum amount of contacts!");
+    printf("You have reach maximum amount of contacts!\n");
     return;
   }
 
@@ -351,7 +358,7 @@ void addContact()
     toLowerCase(user.name);
 
     while (1)
-    {
+    { // keep asking user input until it meet the format requirements
       printf("Enter user's phone number (601xxxxxx): ");
       readLine(user.phone, sizeof(user.phone));
       int phoneRes = isValidNumber(user.phone); // input validate (pass == 1  fail == 0)
@@ -411,7 +418,7 @@ int readFile(const char *filename, User list[], int maxUsers)
   {
     char tempName[MAX_LENGTH] = "";
     char tempPhone[20] = "";
-    char tempEmail[50] = "";
+    char tempEmail[MAX_LENGTH] = "";
 
     // Split the line into tokens
     char *token = strtok(line, " \n");
