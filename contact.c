@@ -51,6 +51,7 @@ void restoreContact();
 void dataEncryption(User *user);
 void dataDecryption(User *user, int count);
 void printLogo();
+int countFileUser();
 
 // print LOGO when program start
 void printLogo()
@@ -279,17 +280,58 @@ int saveToFileBatch(User *user, int number)
   return 1;
 }
 
+// Count the number in the txt file
+int countFileUser()
+{
+  FILE *file = fopen("contact.txt", "r");
+  if (!file)
+  {
+    return -1; // Return error code if file cannot be opened
+  }
+
+  char line[MAX_LENGTH];
+  int userCount = 0; // Counter for the number of users in file
+
+  while (fgets(line, sizeof(line), file))
+  {
+    userCount++;
+  }
+
+  return userCount - 1;
+}
+
 // Add new contact
 void addContact()
 {
+  int userCount = countFileUser();
   int num;
 
+  if (userCount < 0)
+  {
+    return;
+  }
+
+  // if userCount >80
+  if (userCount >= MAX_USERS)
+  {
+    printf("you have reach maximum amount of contacts!");
+    return;
+  }
+
   printf("Enter number of user you like to add (max:%d): ", MAX_USERS);
+  printf("(current number available: %d/80): ", MAX_USERS - userCount);
   // less than 100 user in a time
   scanf("%d", &num);
   // Clear the input buffer to avoid issues with fgets
   // Exp: Enter user's name: Enter user's phone number:
   getchar();
+
+  // error handling
+  if (userCount + num > MAX_USERS)
+  {
+    printf("You have reach maximum amount of contacts!");
+    return;
+  }
 
   // error handling with invalid input
   if (num <= 0 || num > MAX_USERS)
@@ -381,6 +423,7 @@ int readFile(const char *filename, User list[], int maxUsers)
     while (token != NULL)
     {
       tokens[tokenCount++] = token;
+      // Passing NULL tells strtok() to continue from where it left off in the previous call exp: John doe, firstcall: john, secondcall: doe
       token = strtok(NULL, " \n");
     }
 
@@ -425,8 +468,8 @@ int readFile(const char *filename, User list[], int maxUsers)
   return count; // Return the number of users read from file
 }
 
-// Sort
-// Function of bubble sort for contact name
+//  Sort
+//  Function of bubble sort for contact name
 void sortContact()
 {
   // if we get -1 means error occur
@@ -989,6 +1032,7 @@ int main()
     {
     case 1: // Add
       addContact();
+      // generateUsers();
       break;
     case 2: // Edit
       editContact();
