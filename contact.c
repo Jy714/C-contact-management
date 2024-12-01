@@ -201,7 +201,20 @@ void printList(int userCount)
   }
 }
 
-// Function to validate email Need to change
+// function to validate name
+int isValidName(char name[])
+{
+  for (int i = 0; i < strlen(name); i++)
+  {
+    if (isalnum(name[i]) == 0)
+    { // mean is not alphabet or number
+      return 0;
+    }
+    return 1;
+  }
+}
+
+// Function to validate email
 int isValidEmail(char email[])
 {
   char *aSymbol = strchr(email, '@'); // check for first occurrence
@@ -330,13 +343,14 @@ void addContact()
   // less than 100 user in a time
   if (scanf("%d", &num) != 1)
   { // if the scanf return a value which is not 1, that's mean it is not an integer
+
+    getchar();
     printf("Enter a valid number!\n");
     return;
   }
   // Clear the input buffer to avoid issues with fgets
   // Exp: Enter user's name: Enter user's phone number:
   getchar();
-
   // error handling
   if (userCount + num > MAX_USERS)
   {
@@ -355,14 +369,27 @@ void addContact()
   {
     User user;
     printf("Contact %d: \n", i + 1);
-    printf("Enter user's name: ");
-    readLine(user.name, sizeof(user.name));
-
-    // in order to make the comparison (sort) easier and fair, we decided to convert the strings to lowerCase
-    toLowerCase(user.name);
 
     while (1)
     { // keep asking user input until it meet the format requirements
+      printf("Enter user's name: ");
+      readLine(user.name, sizeof(user.name));
+      // in order to make the comparison (sort) easier and fair, we decided to convert the strings to lowerCase
+      toLowerCase(user.name);
+      int nameRes = isValidName(user.name); // input validate (pass == 1  fail == 0)
+
+      if (nameRes != 1)
+      {
+        printf("Name format is not correct!\n");
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    while (1)
+    {
       printf("Enter user's phone number (601xxxxxx): ");
       readLine(user.phone, sizeof(user.phone));
       int phoneRes = isValidNumber(user.phone); // input validate (pass == 1  fail == 0)
@@ -630,6 +657,13 @@ void editContact()
     fgets(newName, 50, stdin);
 
     newName[strcspn(newName, "\n")] = '\0';
+
+    int nameRes = isValidNumber(newName);
+    if (nameRes != 1)
+    {
+      printf("Name format is not correct!");
+      return;
+    }
 
     toLowerCase(newName);
 
