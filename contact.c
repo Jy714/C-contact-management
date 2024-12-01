@@ -328,7 +328,11 @@ void addContact()
   printf("Enter number of user you like to add (max:%d)\n", MAX_USERS);
   printf("(current number available: %d/80): ", MAX_USERS - userCount);
   // less than 100 user in a time
-  scanf("%d", &num);
+  if (scanf("%d", &num) != 1)
+  { // if the scanf return a value which is not 1, that's mean it is not an integer
+    printf("Enter a valid number!\n");
+    return;
+  }
   // Clear the input buffer to avoid issues with fgets
   // Exp: Enter user's name: Enter user's phone number:
   getchar();
