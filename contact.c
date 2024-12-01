@@ -569,13 +569,13 @@ int displayUser()
   if (userCount == 0)
   {
     printf("No users. \n");
-    return 1;
+    return -1;
   }
 
   if (userCount < 0)
   { // error occur
     printf("Some error occurred when open the file");
-    return 1;
+    return -1;
   }
 
   printf("%d users found:\n", userCount);
@@ -591,6 +591,12 @@ void editContact()
 {
   // display the user so they can choose the contact to edit
   int userCount = displayUser();
+
+  // if userCount == 1 (no user)
+  if (userCount == -1)
+  {
+    return;
+  }
   // user input to edit the user
   int userToEdit;
   printf("Choose the index of the contact to edit: ");
