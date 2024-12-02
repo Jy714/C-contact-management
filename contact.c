@@ -716,7 +716,7 @@ void editContact()
 
     newName[strcspn(newName, "\n")] = '\0';
 
-    int nameRes = isValidNumber(newName);
+    int nameRes = isValidName(newName);
     if (nameRes != 1)
     {
       printf("\n\t\tName format is not correct!");
