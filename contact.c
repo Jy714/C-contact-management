@@ -935,6 +935,7 @@ void deleteByName()
   if (userCount <= 0)
   {
     printf(userCount == 0 ? "No users found.\n" : "Error reading the file.\n");
+    Exit();
     return;
   }
 
@@ -950,12 +951,14 @@ void deleteByName()
   if (foundCount <= 0)
   {
     printf(foundCount == 0 ? "No contacts found.\n" : "Error occurred during the search.\n");
+    Exit();
     return;
   }
 
   if (foundCount == 1)
   {
     deleteContact(indices[0], userCount);
+    Exit();
     return;
   }
 
@@ -978,10 +981,13 @@ void deleteByName()
     if (decision < 1 || decision > foundCount)
     {
       printf("Invalid Input.\n");
+      Exit();
       return;
     }
 
     deleteContact(indices[decision - 1], userCount);
+    Exit();
+    return;
   }
   else if (choice == 2)
   {
@@ -1009,17 +1015,22 @@ void deleteByName()
       }
 
       printf("Users deleted successfully!\n");
-
       saveToFileBatch(list, userCount);
+    }
+    else if (confirmation == 'n' || confirmation == 'N')
+    {
+      printf("Cancelled...\n");
     }
     else
     {
       printf("Invalid Input!\n");
     }
+    Exit();
   }
   else
   {
     printf("Cancelled...\n");
+    Exit();
   }
 }
 // clear contact
