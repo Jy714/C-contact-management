@@ -80,11 +80,11 @@ void Exit()
 
     if (isInvalid)
     {
-      printf("\tInvalid input!");
+      printf("\tInvalid input! Please enter 0 to go back menu. \n");
     }
     else
     {
-      printf("\tInvalid input!");
+      printf("\tInvalid input! Please enter 0 to go back menu. \n");
     }
   }
 }
@@ -215,12 +215,14 @@ void toLowerCase(char str[])
 void printList(int userCount)
 {
   // Header
-  printf("%-5s %-25s %-15s %-30s\n", "no.", "Name", "Phone", "Email");
-  printf("-----------------------------------------------------------------------------\n");
+  printf("|********|***********************************************|**********************|********************************|\n");
+  printf("| %-6s | %-45s | %-20s | %-30s |\n", "No.", "Name", "Phone", "Email");
+  printf("|********|***********************************************|**********************|********************************|\n");
 
   for (int i = 0; i < userCount; i++)
   {
-    printf("%-5d %-25s %-15s %-30s\n", i + 1, list[i].name, list[i].phone, list[i].email);
+    printf("| %-6d | %-45s | %-20s | %-30s |\n", i + 1, list[i].name, list[i].phone, list[i].email);
+    printf("|________|_______________________________________________|______________________|________________________________|\n");
   }
   printf("\n\n");
 }
@@ -362,7 +364,7 @@ void addContact()
   // if userCount >80
   if (userCount >= MAX_USERS)
   {
-    printf("\t\t\tYou have reach maximum amount of contacts!\n");
+    printf("\t\t\t\t\tYou have reach maximum amount of contacts!\n");
     Exit();
     return;
   }
@@ -374,17 +376,18 @@ void addContact()
   { // if the scanf return a value which is not 1, that's mean it is not an integer
 
     getchar();
-    printf("\n\n\t\t\tEnter a valid number!\n");
+    printf("\n\n\t\t\t\t\t[ Enter a valid number! ]\n");
     Exit();
     return;
   }
+
   // Clear the input buffer to avoid issues with fgets
   // Exp: Enter user's name: Enter user's phone number:
   getchar();
   // error handling
   if (userCount + num > MAX_USERS)
   {
-    printf("\n\n\t\t\tYou have reach maximum amount of contacts!\n");
+    printf("\n\n\t\t\t\t\t[ You have reach maximum amount of contacts! ]\n");
     Exit();
     return;
   }
@@ -392,7 +395,7 @@ void addContact()
   // error handling with invalid input
   if (num <= 0 || num > MAX_USERS)
   {
-    printf("\n\n\t\t\tInvalid number of users!\n");
+    printf("\n\n\t\t\t\t\t[ Invalid number of users! ]\n");
     Exit();
     return;
   }
@@ -400,7 +403,7 @@ void addContact()
   for (int i = 0; i < num; i++)
   {
     User user;
-    printf("\nContact %d: \n", i + 1);
+    printf("\n\n\nContact %d: \n", i + 1);
 
     while (1)
     { // keep asking user input until it meet the format requirements
@@ -412,7 +415,7 @@ void addContact()
 
       if (nameRes != 1)
       {
-        printf("\n\n\t\t\tName format is not correct!\n");
+        printf("[ Name format is not correct! ]\n");
       }
       else
       {
@@ -427,7 +430,7 @@ void addContact()
       int phoneRes = isValidNumber(user.phone); // input validate (pass == 1  fail == 0)
       if (phoneRes != 1)
       {
-        printf("\n\t\t\tPhone number format is not correct!\n");
+        printf("[ Phone number format is not correct! ]\n");
       }
       else
       {
@@ -445,7 +448,7 @@ void addContact()
 
       if (emailRes != 1)
       {
-        printf("\n\t\t\tEmail format is not correct!\n");
+        printf("[ Email format is not correct! ]\n");
       }
       else
       {
@@ -456,11 +459,11 @@ void addContact()
     // error handling for saveToFile function
     if (saveToFile(user) > 0)
     {
-      printf("\n\n\t\t\t[ User added successfully! ]\n");
+      printf("\n\t\t\t\t\t[ User added successfully! ]\n");
     }
     else
     {
-      printf("\n\n\t\t\t[ Failed to add user,Please try again... ]\n");
+      printf("\n\n\t\t\t\t\t[ Failed to add user,Please try again... ]\n");
     }
   }
   Exit();
@@ -551,7 +554,7 @@ void sortContact()
   // error handling
   if (userCount == 0)
   {
-    printf("No users found in the file. \n");
+    printf("No user found in file. \n");
     Exit();
     return;
   }
@@ -565,10 +568,10 @@ void sortContact()
 
   // ask user want sort by using name / phone / email
   printf("The sorting result will permanently store in the database!\n\n");
-  printf("\t\t~~1. Name         ~~\n");
-  printf("\t\t~~2. Phone Number ~~\n");
-  printf("\t\t~~3. Email        ~~\n\n");
-  printf("\t\tSort by: ");
+  printf("\t\t\t\t\t====== 1. Name         ======\n");
+  printf("\t\t\t\t\t====== 2. Phone Number ======\n");
+  printf("\t\t\t\t\t====== 3. Email        ======\n\n");
+  printf("\t\t\t\t\tSort by: ");
 
   // ask user input
   int res;
@@ -577,7 +580,7 @@ void sortContact()
 
   if (res < 1 || res > 3)
   {
-    printf("\t\t\tInvalid input !");
+    printf("\n\t\t\t\t\t[ Invalid input. ]\n");
     Exit();
     return;
   }
@@ -635,12 +638,12 @@ int displayUser(int includeExit)
   system("cls");
   // if we get -1 means error occur
   int userCount = readFile("contact.txt", list, 80);
-  printf("\n\t\t\t\t\t****** Contact List******\n\n\n");
+  printf("\n\t\t\t\t\t****** Contact List ******\n\n\n");
 
   // error handling
   if (userCount == 0)
   {
-    printf("No user found. \n");
+    printf("No user found in file. \n");
     if (includeExit)
     {
       Exit(); // Call exit only if the set is flag
@@ -658,10 +661,9 @@ int displayUser(int includeExit)
     return -1;
   }
 
-  printf("\n\n%d Users found:\n\n", userCount);
-
   // loop to print the user
   printList(userCount);
+  printf("%d Users found.\n\n", userCount);
 
   if (includeExit)
   {
@@ -681,7 +683,7 @@ void editContact()
   // if userCount == 1 (no user)
   if (userCount == -1)
   {
-    printf("No user found.");
+    Exit();
     return;
   }
   // user input to edit the user
@@ -692,17 +694,17 @@ void editContact()
   // error handling
   if (userToEdit < 1 || userToEdit > userCount)
   {
-    printf("\n\t\tInvalid input!\n");
+    printf("\n\t\t\t\t\t[ Invalid input! ]\n");
     Exit();
     return; // exit with error
   }
   // ask user want to edit name / phone / email / all
   printf("\n\n");
-  printf("\t~~ 1. Name  ~~\n");
-  printf("\t~~ 2. Phone ~~\n");
-  printf("\t~~ 3. Email ~~\n");
-  printf("\t~~ 4. All   ~~\n\n");
-  printf("Which part would you like to edit: ");
+  printf("\t\t\t\t\t====== 1. Name  ======\n");
+  printf("\t\t\t\t\t====== 2. Phone ======\n");
+  printf("\t\t\t\t\t====== 3. Email ======\n");
+  printf("\t\t\t\t\t====== 4. All   ======\n\n");
+  printf("\t\t\t\t\tWhich part would you like to edit: ");
   int res; // used to record user answer for edit part
   scanf("%d", &res);
   getchar();
@@ -719,7 +721,7 @@ void editContact()
     int nameRes = isValidName(newName);
     if (nameRes != 1)
     {
-      printf("\n\t\tName format is not correct!");
+      printf("[ Name format is not correct! ]");
       Exit();
       return;
     }
@@ -740,7 +742,7 @@ void editContact()
     int phoneRes = isValidNumber(newPhone);
     if (phoneRes != 1)
     {
-      printf("\n\t\tPhone number format is not correct!");
+      printf("[ Phone number format is not correct! ]");
       Exit();
       return;
     }
@@ -759,7 +761,7 @@ void editContact()
     int emailRes = isValidEmail(newEmail);
     if (emailRes != 1)
     {
-      printf("\n\t\tEmail format is not correct!");
+      printf("[ Email format is not correct! ]");
       Exit();
       return;
     }
@@ -793,19 +795,19 @@ void editContact()
 
     if (phoneRes != 1 && emailRes != 1)
     {
-      printf("\n\t\tPhone number and email format are not correct!");
+      printf("[ Phone number and email format are not correct! ]");
       Exit();
       return;
     }
     if (phoneRes != 1)
     {
-      printf("\n\t\tPhone number format is not correct!");
+      printf("[ Phone number format is not correct! ]");
       Exit();
       return;
     }
     if (emailRes != 1)
     {
-      printf("\n\t\tEmail format is not correct!");
+      printf("[ Email format is not correct! ]");
       Exit();
       return;
     }
@@ -816,7 +818,7 @@ void editContact()
     break;
   }
   default:
-    printf("\n\t\tInvalid input!\n");
+    printf("\n\t\t\t\t\t[ Invalid input. ]\n");
     Exit();
     return;
   }
@@ -824,7 +826,7 @@ void editContact()
   // write new result into the file
   saveToFileBatch(list, userCount);
 
-  printf("\n\t\t\t[ Edit Successfully! ]\n");
+  printf("\n\t\t\t\t\t[ Edit Successfully! ]\n");
   Exit();
 }
 
@@ -836,7 +838,7 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
   if (userCount <= 0)
   {
     // if 0 print no user found, others must be less than 0
-    printf(userCount == 0 ? "No users found!\n" : "Some error occurred when open the file...\n");
+    printf(userCount == 0 ? "No user found.\n" : "Some error occurred when open the file...\n");
     Exit();
     return -1; // Return -1 for errors, 0 for no users
   }
@@ -851,7 +853,9 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
 
   int found = 0;
   int matchedIndex = 1;
-  // printf("no. Name Phone Email\n");
+  printf("|********|***********************************************|**********************|********************************|\n");
+  printf("| %-6s | %-45s | %-20s | %-30s |\n", "No.", "Name", "Phone", "Email");
+  printf("|********|***********************************************|**********************|********************************|\n");
   for (int i = 0; i < userCount; i++)
   {
     char lowerName[MAX_PROPERTY_LENGTH];
@@ -861,7 +865,8 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
     // here is the key that allow us to do the partial function
     if (strncmp(lowerName, searchName, strlen(searchName)) == 0)
     {
-      printf("\n%d. %s %s %s\n", matchedIndex++, list[i].name, list[i].phone, list[i].email);
+      printf("| %-6d | %-45s | %-20s | %-30s |\n", matchedIndex++, list[i].name, list[i].phone, list[i].email);
+      printf("|________|_______________________________________________|______________________|________________________________|\n");
 
       if (indices != NULL && found < maxIndices)
       {
@@ -873,7 +878,8 @@ int searchContactByName(const char *name, int *indices, int maxIndices)
 
   if (found == 0)
   {
-    printf("\n\t\tNo contacts found with the name '%s'.\n", name);
+    printf("\n[ No contact found with the name '%s'. ]\n", name);
+    Exit();
   }
 
   return found; // Return the number of matches found
@@ -888,14 +894,15 @@ void searchContact()
   printf("Enter the name you want to search for: ");
   fgets(name, MAX_PROPERTY_LENGTH, stdin);
   name[strcspn(name, "\n")] = '\0';
+  printf("\n");
 
   int result = searchContactByName(name, NULL, 0); // NULL means we don't need indices
 
   if (result > 0)
   {
     printf("\nTotal contact found: %d\n", result);
+    Exit();
   }
-  Exit();
 }
 
 // remove contact
@@ -934,7 +941,7 @@ void deleteByName()
 
   if (userCount <= 0)
   {
-    printf(userCount == 0 ? "No users found.\n" : "Error reading the file.\n");
+    printf(userCount == 0 ? "No user found.\n" : "Error reading the file.\n");
     Exit();
     return;
   }
@@ -944,14 +951,15 @@ void deleteByName()
   printf("Enter the name of the contact to delete: ");
   fgets(deletedName, sizeof(deletedName), stdin);
   deletedName[strcspn(deletedName, "\n")] = '\0'; // Remove trailing newline
+  printf("\n");
 
   int indices[MAX_USERS];
   int foundCount = searchContactByName(deletedName, indices, MAX_USERS);
 
   if (foundCount <= 0)
   {
-    printf(foundCount == 0 ? "No contacts found.\n" : "Error occurred during the search.\n");
-    Exit();
+    // printf(foundCount == 0 ? "\t\t\t[ No contact found. ]" : "Error occurred during the search.\n");
+    // Exit();
     return;
   }
 
@@ -963,9 +971,9 @@ void deleteByName()
   }
 
   // if multiple contact matched
-  printf("\n\n%d contacts found.\n", foundCount);
-  printf("1. Delete One\n2. Delete All\n");
-  printf("Your choice: ");
+  printf("\n\n%d contacts found.\n\n", foundCount);
+  printf("\t\t\t\t\t====== 1. Delete One ======\n\t\t\t\t\t====== 2. Delete All ======\n\n");
+  printf("\t\t\t\t\tYour choice: ");
 
   int choice;
   scanf("%d", &choice);
@@ -973,14 +981,14 @@ void deleteByName()
 
   if (choice == 1)
   {
-    printf("Enter the index of the contact to delete (1 to %d): ", foundCount);
+    printf("\n\nEnter the index of the contact to delete (1 to %d): ", foundCount);
     int decision;
     scanf("%d", &decision);
     getchar();
 
     if (decision < 1 || decision > foundCount)
     {
-      printf("Invalid Input.\n");
+      printf("\n\t\t\t\t\t[ Invalid input! ]\n");
       Exit();
       return;
     }
@@ -991,15 +999,16 @@ void deleteByName()
   }
   else if (choice == 2)
   {
-    printf("Are you sure you want to delete all matching contacts? (y/n): ");
-    char confirmation;
-    scanf(" %c", &confirmation);
-    getchar();
+    char confirmation[MAX_PROPERTY_LENGTH];
+    printf("\n\nAre you sure you want to delete all matching contacts? (y/n): ");
+    fgets(confirmation, sizeof(confirmation), stdin);
+    confirmation[strcspn(confirmation, "\n")] = '\0';
 
-    if (confirmation == 'y' || confirmation == 'Y')
+    // if using scanf, user input yxxx also will execute because scanf only take one character from our input
+    if (strcmp(confirmation, "y") == 0 || strcmp(confirmation, "Y") == 0)
     {
+      // Proceed with deletion
       int deletedCount = 0;
-
       for (int i = 0; i < foundCount; i++)
       {
         int index = indices[i] - deletedCount;
@@ -1014,23 +1023,17 @@ void deleteByName()
         deletedCount++;
       }
 
-      printf("Users deleted successfully!\n");
+      printf("\n\t\t\t\t\t[ Users deleted successfully! ]\n");
       saveToFileBatch(list, userCount);
     }
-    else if (confirmation == 'n' || confirmation == 'N')
+    else if (strcmp(confirmation, "n") == 0 || strcmp(confirmation, "N") == 0)
     {
-      printf("Cancelled...\n");
+      printf("\n\t\t\t\t\t[ Cancelled. ]\n");
     }
     else
     {
-      printf("Invalid Input!\n");
+      printf("\n\t\t\t\t\t[ Invalid Input. ]\n");
     }
-    Exit();
-  }
-  else
-  {
-    printf("Cancelled...\n");
-    Exit();
   }
 }
 // clear contact
@@ -1052,22 +1055,22 @@ void clearContact()
   case 'Y':
     if ((file = fopen("contact.txt", "w")) == NULL)
     {
-      printf("\n\nSome error occurred when open the file");
+      printf("\n\nSome error occurred when open the file...");
       exit(1);
     }
     else
     {
-      printf("\n\n\t\t[ Data cleared successfully!] \n");
+      printf("\n\n\t\t\t\t\t[ Data cleared successfully!] \n");
       Exit();
     }
     return;
   case 'n':
   case 'N':
-    printf("\n\n\t\t[ Cancel...]\n");
+    printf("\n\n\t\t\t\t\t[ Cancel...]\n");
     Exit();
     return;
   default:
-    printf("\n\n\t\tInvalid input\n");
+    printf("\n\n\t\t\t\t\t[ Invalid input. ]\n");
     Exit();
     return;
   }
@@ -1080,33 +1083,37 @@ void restoreContact()
   printf("\n\t\t\t\t\t****** Restore Contact ******\n\n\n");
   if (count <= 0)
   {
-    printf("No users found!\n");
+    printf("No user found.\n");
     Exit();
     return;
   }
-  printf("Total of %d user in the list:\n\n", count);
+  printf("Total of %d user in the list.\n\n", count);
 
-  printf("no. Name Phone Email\n");
+  printf("|********|***********************************************|**********************|********************************|\n");
+  printf("| %-6s | %-45s | %-20s | %-30s |\n", "No.", "Name", "Phone", "Email");
+  printf("|********|***********************************************|**********************|********************************|\n");
   for (int i = 0; i < count; i++)
   {
-    printf("%d. %s %s %s\n", i + 1, restoreList[i].name, restoreList[i].phone, restoreList[i].email);
+    printf("| %-6d | %-45s | %-20s | %-30s |\n", i + 1, restoreList[i].name, restoreList[i].phone, restoreList[i].email);
+    printf("|        |                                               |                      |                                |\n");
   }
+  printf("******************************************************************************************************************\n");
 
-  printf("\n\nWhich user you would like to restore (index, -1 to cancel):");
+  printf("\n\nWhich user you would like to restore (index, -1 to cancel): ");
   int choice;
   scanf("%d", &choice);
   getchar();
   // if user input -1
   if (choice == -1)
   {
-    printf("\n\t\t[ Cancelled ]\n");
+    printf("\n\t\t\t\t\t[ Cancelled ]\n");
     Exit();
     return;
   }
 
-  if (choice < -1 || choice > count)
+  if (choice <= 0 || choice > count)
   {
-    printf("\n\t\tInvalid input!\n");
+    printf("\n\t\t\t\t\t[ Invalid input. ]\n");
     Exit();
     return;
   }
